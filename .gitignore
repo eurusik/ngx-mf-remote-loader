@@ -2,6 +2,9 @@
 node_modules/
 dist/
 
+# Nx cache
+.nx/cache/
+
 # Logs
 logs
 *.log
