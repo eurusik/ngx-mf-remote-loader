@@ -1,0 +1,16 @@
+{
+  "name": "ngx-mf-remote-loader",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "@angular/core": "^17.0.0",
+    "@angular/router": "^17.0.0"
+  },
+  "dependencies": {
+    "@nx/angular": "^17.0.0"
+  }
+}
