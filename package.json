@@ -1,11 +1,31 @@
 {
   "name": "ngx-mf-remote-loader",
   "version": "1.0.0",
+  "description": "SSR-compatible remote module loader for Angular Micro Frontends",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
   },
+  "keywords": [
+    "angular",
+    "ssr",
+    "microfrontends",
+    "module-federation",
+    "nx",
+    "remote-loader"
+  ],
+  "author": "eurusik",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eurusik/ngx-mf-remote-loader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eurusik/ngx-mf-remote-loader/issues"
+  },
+  "homepage": "https://github.com/eurusik/ngx-mf-remote-loader#readme",
   "peerDependencies": {
     "@angular/core": "^17.0.0",
     "@angular/router": "^17.0.0"
