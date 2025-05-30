@@ -143,6 +143,8 @@ The manifest file is a simple JSON mapping of remote module names to their URLs:
 
 **Required Step:** For ngx-mf-remote-loader to function correctly, you must load the manifest file in your host application and set the remote definitions as shown below:
 
+#### Using setRemoteDefinitions (Deprecated in Nx 22)
+
 ```typescript
 // main.ts
 import { setRemoteDefinitions } from '@nx/angular/mf';
@@ -153,6 +155,40 @@ fetch('assets/module-federation.manifest.json')
   .then((definitions) => setRemoteDefinitions(definitions))
   .then(() => import('./bootstrap').catch((err) => console.error(err)));
 ```
+
+#### Using init() from @module-federation/enhanced/runtime (Recommended)
+
+```typescript
+// main.ts
+import { init } from '@module-federation/enhanced/runtime';
+
+// Example of direct initialization
+init({
+  name: 'host',
+  remotes: [{
+    name: 'my-remote-app',
+    entry: 'http://localhost:4201/mf-manifest.json'
+  }]
+});
+
+// Or loading from a manifest file
+fetch('assets/module-federation.manifest.json')
+  .then((res) => res.json())
+  .then((definitions) => {
+    const remotes = Object.entries(definitions).map(([name, entry]) => ({
+      name,
+      entry
+    }));
+    
+    return init({
+      name: 'host',
+      remotes
+    });
+  })
+  .then(() => import('./bootstrap').catch((err) => console.error(err)));
+```
+
+> **Note:** `setRemoteDefinitions` will be removed in Nx 22. It's recommended to migrate to `init()` from `@module-federation/enhanced/runtime`.
 
 This initialization step is essential for our library to properly resolve and load remote modules.
 
