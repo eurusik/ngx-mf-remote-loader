@@ -123,6 +123,99 @@ export class CustomRemoteLoaderServer extends RemoteLoaderServer {
 }
 ```
 
+## Module Federation Manifest Setup
+
+**Important:** Setting up the module-federation.manifest.json file is a required step for ngx-mf-remote-loader to work properly. This manifest is essential for mapping remote module names to their URLs and is a crucial part of the Nx Module Federation setup that our library depends on.
+
+### Manifest Structure
+
+The manifest file is a simple JSON mapping of remote module names to their URLs:
+
+```json
+{
+  "remote-app-1": "http://localhost:4201",
+  "remote-app-2": "http://localhost:4202",
+  "remote-app-3": "http://localhost:4203"
+}
+```
+
+### Loading the Manifest
+
+**Required Step:** For ngx-mf-remote-loader to function correctly, you must load the manifest file in your host application and set the remote definitions as shown below:
+
+```typescript
+// main.ts
+import { setRemoteDefinitions } from '@nx/angular/mf';
+
+// Load the manifest file at application startup
+fetch('assets/module-federation.manifest.json')
+  .then((res) => res.json())
+  .then((definitions) => setRemoteDefinitions(definitions))
+  .then(() => import('./bootstrap').catch((err) => console.error(err)));
+```
+
+This initialization step is essential for our library to properly resolve and load remote modules.
+
+### How It Works
+
+1. **Initialization**: The host application loads the manifest file and passes it to `setRemoteDefinitions()`
+2. **Remote Loading**: When `loadRemoteModule()` is called, it:
+   - Looks up the remote's URL in the manifest
+   - Dynamically loads the JavaScript from that URL
+   - Returns the requested module or component
+
+### Environment-Specific Manifests
+
+You can create environment-specific manifest files for different deployment environments:
+
+```
+/assets/
+  module-federation.manifest.dev.json
+  module-federation.manifest.prod.json
+  module-federation.manifest.json  # The active manifest
+```
+
+During the build process, you can copy the appropriate environment-specific manifest to the main module-federation.manifest.json file.
+
+### Advanced: Dynamic Manifest Updates
+
+For applications that need to update remote URLs at runtime:
+
+```typescript
+import { setRemoteDefinitions } from '@nx/angular/mf';
+
+// Fetch an updated manifest from your API
+fetchUpdatedManifest().then(newDefinitions => {
+  setRemoteDefinitions(newDefinitions);
+  // Now loadRemoteModule will use the updated URLs
+});
+```
+
+### Troubleshooting
+
+Common issues with module federation manifest:
+
+- **404 Not Found**: Ensure the manifest file is correctly copied to the assets folder during build
+- **Remote Loading Failures**: Verify that the URLs in your manifest are correct and accessible
+- **SSR Errors**: For server-side rendering, ensure you've properly configured the server-side loader
+
+### Implementation Details
+
+Under the hood, the library uses Nx's `loadRemoteModule` function, which relies on the manifest definitions:
+
+```typescript
+// RemoteLoaderBrowser implementation
+export class RemoteLoaderBrowser extends RemoteLoader {
+  load(remoteName: string, remoteModule: RemoteItems): Promise<any> {
+    return loadRemoteModule(remoteName, './' + remoteModule).then((m) => {
+      return remoteModule === 'Module' ? m.RemoteEntryModule : m;
+    });
+  }
+}
+```
+
+This approach ensures compatibility with the Nx Module Federation system while providing a more convenient API for Angular applications.
+
 ## License
 
 MIT
