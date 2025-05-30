@@ -365,28 +365,7 @@ When you generate a remote component using this generator, it automatically:
    npm install ngx-remote-component
    ```
 
-   Import the module and configure it with our loader:
-   ```typescript
-   import { NgModule } from '@angular/core';
-   import { RemoteComponentModule, REMOTE_COMPONENT_LOADER } from 'ngx-remote-component';
-   import { RemoteLoaderBrowser, RemoteLoaderServer } from 'ngx-mf-remote-loader';
-
-   @NgModule({
-     imports: [
-       RemoteComponentModule
-     ],
-     providers: [
-       {
-         provide: REMOTE_COMPONENT_LOADER,
-         // Use RemoteLoaderBrowser for browser environments
-         useClass: RemoteLoaderBrowser
-         // Or use RemoteLoaderServer for server-side rendering
-         // useClass: RemoteLoaderServer
-       }
-     ]
-   })
-   export class AppModule { }
-   ```
+   For detailed installation and configuration instructions, please refer to the [ngx-remote-component documentation](https://github.com/eurusik/ngx-remote-component).
 
    Then use the directive in your templates:
    ```typescript
