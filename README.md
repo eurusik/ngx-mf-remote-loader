@@ -313,6 +313,67 @@ export class RemoteLoaderBrowser extends RemoteLoader {
 
 This approach ensures compatibility with the Nx Module Federation system while providing a more convenient API for Angular applications.
 
+## Recommended Companion Tool: nx-mf-remote-loader-generator
+
+For the best development experience, we strongly recommend using our companion tool [nx-mf-remote-loader-generator](https://github.com/eurusik/nx-mf-remote-loader-generator) which automates the creation and configuration of remote components that work seamlessly with this library.
+
+### What nx-mf-remote-loader-generator Does
+
+- Creates a new Angular component in your specified remote application
+- Configures the component to be exposed via Module Federation
+- Updates the remote application's TypeScript configuration
+- **Automatically adds the component to the remote loader server for SSR support**
+- Adds type declarations for the remote component
+
+### Installation
+
+```bash
+npm install nx-mf-remote-loader-generator
+```
+
+### Usage
+
+Once installed, you can use the generator to create a new remote component:
+
+```bash
+nx g nx-mf-remote-loader-generator:remoteComponent \
+  --remote=my-remote-app \
+  --name=MyComponent \
+  --selector=my-remote-component
+```
+
+### How It Works With ngx-mf-remote-loader
+
+When you generate a remote component using this generator, it automatically:
+
+1. **Registers the component in the remote loader server** with code like:
+   ```typescript
+   case 'my-remoteMyComponent':
+     // eslint-disable-next-line @nx/enforce-module-boundaries
+     return import('my-remote/MyComponent');
+   ```
+
+2. **Adds type declarations** in the remotes.d.ts file:
+   ```typescript
+   declare module 'my-remote/MyComponent'
+   ```
+
+3. In your host application, you can now use the remote component:
+   ```typescript
+   import { RemoteLoaderComponent } from 'ngx-mf-remote-loader';
+
+   @Component({
+     template: `
+       <remote-loader remoteId="my-remoteMyComponent"></remote-loader>
+     `
+   })
+   export class AppComponent {}
+   ```
+
+4. **Server-Side Rendering**: When the page is rendered on the server, ngx-mf-remote-loader will use the registered component from the server-side registry to render it properly.
+
+For more information about the nx-mf-remote-loader-generator, visit [https://github.com/eurusik/nx-mf-remote-loader-generator](https://github.com/eurusik/nx-mf-remote-loader-generator).
+
 ## License
 
 MIT
