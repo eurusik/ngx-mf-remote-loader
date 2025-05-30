@@ -358,16 +358,63 @@ When you generate a remote component using this generator, it automatically:
    declare module 'my-remote/MyComponent'
    ```
 
-3. In your host application, you can now use the remote component:
-   ```typescript
-   import { RemoteLoaderComponent } from 'ngx-mf-remote-loader';
+3. In your host application, you can now use the remote component with our recommended directive [ngx-remote-component](https://github.com/eurusik/ngx-remote-component):
 
+   First, install the directive:
+   ```bash
+   npm install ngx-remote-component
+   ```
+
+   Import the module and configure it with our loader:
+   ```typescript
+   import { NgModule } from '@angular/core';
+   import { RemoteComponentModule, REMOTE_COMPONENT_LOADER } from 'ngx-remote-component';
+   import { RemoteLoaderBrowser, RemoteLoaderServer } from 'ngx-mf-remote-loader';
+
+   @NgModule({
+     imports: [
+       RemoteComponentModule
+     ],
+     providers: [
+       {
+         provide: REMOTE_COMPONENT_LOADER,
+         // Use RemoteLoaderBrowser for browser environments
+         useClass: RemoteLoaderBrowser
+         // Or use RemoteLoaderServer for server-side rendering
+         // useClass: RemoteLoaderServer
+       }
+     ]
+   })
+   export class AppModule { }
+   ```
+
+   Then use the directive in your templates:
+   ```typescript
    @Component({
      template: `
-       <remote-loader remoteId="my-remoteMyComponent"></remote-loader>
+       <div 
+         ngxRemoteComponent
+         [remoteName]="'my-remote'"
+         [componentName]="'MyComponent'"
+         [inputs]="{ 
+           productId: { id: '12345' },
+           productParams: { quantity: 1, price: 19.99 }
+         }"
+         (outputs)="handleOutputs($event)">
+       </div>
      `
    })
-   export class AppComponent {}
+   export class AppComponent {
+     handleOutputs(outputs: Record<string, any>) {
+       // Handle outputs from the remote component
+       console.log('Output received:', outputs);
+       
+       // Example: Handle a specific output
+       if ('buttonClick' in outputs) {
+         console.log('Button clicked with data:', outputs['buttonClick']);
+       }
+     }
+   }
    ```
 
 4. **Server-Side Rendering**: When the page is rendered on the server, ngx-mf-remote-loader will use the registered component from the server-side registry to render it properly.
