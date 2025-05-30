@@ -102,22 +102,60 @@ export class AppModule {}
 
 ### Customizing Server-Side Loading
 
-For server-side rendering, you need to customize the `RemoteLoaderServer` implementation to handle your specific remote modules:
+For server-side rendering, you need to customize the `RemoteLoaderServer` implementation to handle your specific remote modules. There are two main approaches:
+
+#### Approach 1: Using registerRemoteModule
 
 ```typescript
 //# ngx-mf-remote-loader-server.ts
 import { RemoteLoaderServer, RemoteItems } from 'ngx-mf-remote-loader';
 
 export class CustomRemoteLoaderServer extends RemoteLoaderServer {
+  constructor() {
+    super();
+    // Register all your remote modules
+    this.registerRemoteModule('app1', 'Module', () => import('app1/Module'));
+    this.registerRemoteModule('app2', 'Module', () => import('app2/Module'));
+    // Add more registrations as needed
+  }
+  
+  // You can also override the load method to add custom logic
   load(remoteName: string, remoteModule: RemoteItems): Promise<any> {
+    // Custom logic here if needed
+    return super.load(remoteName, remoteModule);
+  }
+}
+```
+
+#### Approach 2: Direct switch case implementation
+
+This approach directly handles the module loading with switch cases:
+
+```typescript
+//# ngx-mf-remote-loader-server.ts
+import { RemoteLoader, RemoteItems } from 'ngx-mf-remote-loader';
+
+// Define your specific remote module types for better type safety
+type RemotesKey =
+  | 'app1'
+  | 'app2'
+  | 'app3-component';
+
+export class CustomRemoteLoaderServer extends RemoteLoader {
+  load(remoteName: RemotesKey, remoteModule: RemoteItems): Promise<any> {
     switch (remoteName + remoteModule) {
       case 'app1Module':
+        // eslint-disable-next-line @nx/enforce-module-boundaries
         return import('app1/Module').then((m) => m.RemoteEntryModule);
       case 'app2Module':
+        // eslint-disable-next-line @nx/enforce-module-boundaries
         return import('app2/Module').then((m) => m.RemoteEntryModule);
+      case 'app3-componentCarouselComponent':
+        // eslint-disable-next-line @nx/enforce-module-boundaries
+        return import('app3-component/CarouselComponent');
       // Add more cases as needed
       default:
-        return super.load(remoteName, remoteModule);
+        throw new Error(`Remote module ${remoteName}/${remoteModule} not found`);
     }
   }
 }
