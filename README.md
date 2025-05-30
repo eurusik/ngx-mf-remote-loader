@@ -190,6 +190,29 @@ fetch('assets/module-federation.manifest.json')
 
 > **Note:** `setRemoteDefinitions` will be removed in Nx 22. It's recommended to migrate to `init()` from `@module-federation/enhanced/runtime`.
 
+#### Workaround for Lazy-Loaded Modules
+
+If your application has calls to `loadRemoteModule` inside lazy-loaded NgModules, you might encounter issues with loading federated modules. Here's a workaround that makes remote definitions available globally:
+
+```typescript
+// main.ts
+import { setRemoteDefinitions } from '@nx/angular/mf';
+
+fetch('assets/module-federation.manifest.json')
+  .then((res) => res.json())
+  .then((remoteDefinitions) => {
+    setRemoteDefinitions(remoteDefinitions);
+    
+    // Workaround: Make remote definitions available globally
+    // This helps with loading federated modules in lazy-loaded NgModules
+    // See https://github.com/nrwl/nx/issues/27842
+    Object.assign(globalThis, { remoteDefinitions });
+  })
+  .then(() => import('./bootstrap').catch((err) => console.error(err)));
+```
+
+This workaround assigns the remote definitions to the global scope, making them accessible to lazy-loaded modules that need to resolve remote module URLs.
+
 This initialization step is essential for our library to properly resolve and load remote modules.
 
 ### How It Works
