@@ -2,12 +2,6 @@
 
 SSR-compatible dynamic remote module loader for Angular + Nx Micro Frontends.
 
-## Installation
-
-```bash
-npm install ngx-mf-remote-loader
-```
-
 ## Features
 
 - SSR-compatible remote module loading
